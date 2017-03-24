@@ -275,10 +275,6 @@ impl Borders {
         self.title_font_color = color
     }
 
-    pub fn get_output(&self) -> WlcOutput {
-        self.output
-    }
-
     pub fn title(&self) -> &str {
         self.title.as_str()
     }

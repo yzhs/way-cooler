@@ -1,7 +1,7 @@
 use std::ops::{Deref, DerefMut};
 use rustwlc::{Geometry, Size, Point};
 use super::super::borders::Borders;
-use ::render::{BaseDraw, Drawable, DrawErr};
+use ::render::{BaseDraw, Drawable, DrawErr, Renderable};
 
 /// Draws the borders around windows.
 /// They are all of the same size, including the top.
