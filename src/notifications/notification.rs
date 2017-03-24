@@ -7,7 +7,7 @@ use cairo::{ImageSurface, Format};
 
 use uuid::Uuid;
 use ::registry;
-use ::render::{Color, Renderable};
+use ::render::{Color, Renderable, drop_data};
 
 
 /// A notification to the user that an event has happened.
@@ -27,17 +27,39 @@ pub struct Notification {
     /// width * height * 4. If it's not, then the buffer will fail to draw.
     geometry: Geometry,
     /// The background color that the text is overlayed on to.
-    background_color: Color,
+    ///
+    /// If unspecified, the default from the registry is used.
+    background_color: Option<Color>,
     /// The color that the header/title text is displayed in.
-    title_color: Color,
+    ///
+    /// If unspecified, the default from the registry is used.
+    title_color: Option<Color>,
     /// The color that the body text is displayed in.
-    text_color: Color
+    ///
+    /// If unspecified, the default from the registry is used.
+    text_color: Option<Color>
 }
 
 
 impl Renderable for Notification {
     fn new(mut geometry: Geometry, output: WlcOutput) -> Option<Self> {
-        None
+        Notification::allocate_buffer(geometry, drop_data)
+            .and_then(|surface| {
+                Some(Notification {
+                    surface: surface,
+                    output: output,
+                    title: "".into(),
+                    text: "".into(),
+                    geometry: geometry,
+                    background_color: None,
+                    title_color: None,
+                    text_color: None
+                })})
+    }
+
+    fn allocate_buffer<F>(geometry: Geometry, drop_f: F) -> Option<ImageSurface>
+        where F: FnOnce(Box<[u8]>) + 'static {
+        panic!()
     }
 
     fn set_surface(&mut self, surface: ImageSurface) {
@@ -58,19 +80,5 @@ impl Renderable for Notification {
 
     fn get_output(&self) -> WlcOutput {
         self.output
-    }
-
-    fn allocate_buffer<F>(geometry: Geometry, drop_f: F) -> Option<ImageSurface>
-        where F: FnOnce(Box<[u8]>) + 'static {
-        panic!()
-    }
-
-    /// Updates/Creates the underlying geometry for the surface/buffer.
-    ///
-    /// This causes a reallocation of the buffer, do not call this
-    /// in a tight loop unless you want memory fragmentation and
-    /// bad performance.
-    fn reallocate_buffer(mut self, mut geometry: Geometry) -> Option<Self>{
-        None
     }
 }
