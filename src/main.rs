@@ -40,6 +40,7 @@ mod ipc;
 mod layout;
 
 mod render;
+mod notifications;
 
 use std::env;
 use std::fs::File;

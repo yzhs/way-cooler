@@ -8,7 +8,7 @@ use rustwlc::types::{ButtonState, KeyboardModifiers, KeyState, KeyboardLed, Scro
                      VIEW_MAXIMIZED, VIEW_ACTIVATED, VIEW_RESIZING, VIEW_FULLSCREEN,
                      MOD_NONE, RESIZE_LEFT, RESIZE_RIGHT, RESIZE_TOP, RESIZE_BOTTOM};
 use rustwlc::input::{pointer, keyboard};
-use rustwlc::render::{read_pixels, wlc_pixel_format};
+use rustwlc::render::{write_pixels, read_pixels, wlc_pixel_format};
 use uuid::Uuid;
 
 use super::keys::{self, KeyPress, KeyEvent};
@@ -85,6 +85,18 @@ pub extern fn post_render(output: WlcOutput) {
             sync_scrape();
         }
     }
+    let resolution = output.get_resolution()
+        .expect("Could not get resolution of output");
+    let size = (4 * resolution.w * resolution.h) as usize;
+    let mut buffer = Vec::with_capacity(size);
+    for _ in 0..size {
+        buffer.push(100);
+    }
+    let geo = Geometry {
+        origin: Point { x: 0, y: 0},
+        size: resolution
+    };
+    write_pixels(wlc_pixel_format::WLC_RGBA8888, geo, &buffer);
 }
 
 pub extern fn view_created(view: WlcView) -> bool {
