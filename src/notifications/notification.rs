@@ -40,6 +40,10 @@ impl Renderable for Notification {
         None
     }
 
+    fn set_surface(&mut self, surface: ImageSurface) {
+        self.surface = surface;
+    }
+
     fn get_surface(&mut self) -> &mut ImageSurface {
         &mut self.surface
     }
@@ -54,6 +58,11 @@ impl Renderable for Notification {
 
     fn get_output(&self) -> WlcOutput {
         self.output
+    }
+
+    fn allocate_buffer<F>(geometry: Geometry, drop_f: F) -> Option<ImageSurface>
+        where F: FnOnce(Box<[u8]>) + 'static {
+        panic!()
     }
 
     /// Updates/Creates the underlying geometry for the surface/buffer.

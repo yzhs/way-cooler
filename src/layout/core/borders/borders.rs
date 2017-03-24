@@ -7,7 +7,7 @@ use cairo::{ImageSurface, Format};
 
 use uuid::Uuid;
 use ::registry;
-use ::render::{Color, Renderable};
+use ::render::{Color, Renderable, drop_data};
 
 /// The borders of a container.
 ///
@@ -39,7 +39,46 @@ pub struct Borders {
 }
 
 impl Renderable for Borders {
-    fn new(mut geometry: Geometry, output: WlcOutput) -> Option<Self> {
+    fn new(geometry: Geometry, output: WlcOutput) -> Option<Self> {
+        Borders::allocate_buffer(geometry,
+                                 drop_data)
+            .and_then(|surface| {
+                Some(Borders {
+                    title: "".into(),
+                    surface: surface,
+                    geometry: geometry,
+                    output: output,
+                    color: None,
+                    title_color: None,
+                    title_font_color: None
+                })
+            })
+    }
+
+    fn get_surface(&mut self) -> &mut ImageSurface {
+        &mut self.surface
+    }
+
+    fn set_surface(&mut self, surface: ImageSurface) {
+        self.surface = surface;
+    }
+
+    fn get_geometry(&self) -> Geometry {
+        self.geometry
+    }
+
+    fn set_geometry(&mut self, geometry: Geometry) {
+        self.geometry = geometry;
+    }
+
+    fn get_output(&self) -> WlcOutput {
+        self.output
+    }
+
+    fn allocate_buffer<F>(mut geometry: Geometry, drop_f: F)
+                          -> Option<ImageSurface>
+        where F: FnOnce(Box<[u8]>) + 'static
+    {
         let thickness = Borders::thickness();
         let title_size = Borders::title_bar_size();
         if thickness == 0 {
@@ -56,73 +95,12 @@ impl Renderable for Borders {
         let stride = calculate_stride(w) as i32;
         let data: Vec<u8> = iter::repeat(0).take(h as usize * stride as usize).collect();
         let buffer = data.into_boxed_slice();
-        let surface = ImageSurface::create_for_data(buffer,
-                                                    drop_data,
-                                                    Format::ARgb32,
-                                                    w as i32,
-                                                    h as i32,
-                                                    stride);
-        Some(Borders {
-            title: "".into(),
-            surface: surface,
-            geometry: geometry,
-            output: output,
-            color: None,
-            title_color: None,
-            title_font_color: None
-        })
-    }
-
-    fn get_surface(&mut self) -> &mut ImageSurface {
-        &mut self.surface
-    }
-
-    fn get_geometry(&self) -> Geometry {
-        self.geometry
-    }
-
-    fn set_geometry(&mut self, geometry: Geometry) {
-        self.geometry = geometry;
-    }
-
-    fn get_output(&self) -> WlcOutput {
-        self.output
-    }
-
-    /// Updates/Creates the underlying geometry for the surface/buffer.
-    ///
-    /// This causes a reallocation of the buffer, do not call this
-    /// in a tight loop unless you want memory fragmentation and
-    /// bad performance.
-    fn reallocate_buffer(mut self, mut geometry: Geometry) -> Option<Self>{
-        // Add the thickness to the geometry.
-        let thickness = Borders::thickness();
-        let title_size = Borders::title_bar_size();
-        if thickness == 0 {
-            return None;
-        }
-        geometry.origin.x -= thickness as i32;
-        geometry.origin.y -= thickness as i32;
-        geometry.origin.y -= title_size as i32;
-        geometry.size.w += thickness;
-        geometry.size.h += thickness;
-        geometry.size.h += title_size;
-        let Size { w, h } = geometry.size;
-        if w == self.geometry.size.w && h == self.geometry.size.h {
-            return Some(self);
-        }
-        let stride = calculate_stride(w) as i32;
-        let data: Vec<u8> = iter::repeat(0).take(h as usize * stride as usize).collect();
-        let buffer = data.into_boxed_slice();
-        let surface = ImageSurface::create_for_data(buffer,
-                                                    drop_data,
-                                                    Format::ARgb32,
-                                                    w as i32,
-                                                    h as i32,
-                                                    stride);
-        self.geometry = geometry;
-        self.surface = surface;
-        Some(self)
+        Some(ImageSurface::create_for_data(buffer,
+                                           drop_f,
+                                           Format::ARgb32,
+                                           w as i32,
+                                           h as i32,
+                                           stride))
     }
 }
 
@@ -324,6 +302,3 @@ impl Eq for Borders {}
 
 unsafe impl Send for Borders {}
 unsafe impl Sync for Borders {}
-
-#[allow(dead_code)]
-fn drop_data(_: Box<[u8]>) { }

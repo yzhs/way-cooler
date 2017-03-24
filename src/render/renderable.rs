@@ -2,7 +2,7 @@
 //! A renderable object holds the buffer that is written to wlc_pixel_write.
 //! The buffer can only be modified by casting the type to a `Drawable`.
 
-use rustwlc::{Geometry, WlcOutput};
+use rustwlc::{Geometry, Size, WlcOutput};
 use rustwlc::render::{write_pixels, wlc_pixel_format, calculate_stride};
 use cairo::{self, Context, ImageSurface, Operator};
 use super::draw::BaseDraw;
@@ -19,6 +19,11 @@ pub trait Renderable {
     fn new(geometry: Geometry, output: WlcOutput) -> Option<Self>
         where Self: :: std::marker::Sized;
 
+
+    /// Sets the underlying `ImageSurface` used by the `Renderable` to render
+    /// to wlc.
+    fn set_surface(&mut self, surface: ImageSurface);
+
     /// Gets the underlying `ImageSurface` used by the `Renderable` to render
     /// to wlc.
     ///
@@ -34,12 +39,30 @@ pub trait Renderable {
     /// Gets the output that this will be rendered on.
     fn get_output(&self) -> WlcOutput;
 
+    fn allocate_buffer<F>(geometry: Geometry, drop_f: F) -> Option<ImageSurface>
+        where F: FnOnce(Box<[u8]>) + 'static;
+
     /// Reallocates the buffer based on the new geometry.
     ///
     /// Allowed to return `None` so that a needless allocation doesn't occur
     /// (e.g when the geometry is 0).
-    fn reallocate_buffer(self, geometry: Geometry) -> Option<Self>
-        where Self: ::std::marker::Sized;
+    fn reallocate_buffer(mut self, geometry: Geometry) -> Option<Self>
+        where Self: ::std::marker::Sized
+    {
+        let cur_geo = self.get_geometry();
+        let Size { w, h } = geometry.size;
+        if cur_geo.size.w == w && cur_geo.size.h == h {
+            Some(self)
+        } else {
+            Self::allocate_buffer(geometry,
+                                  drop_data)
+                .and_then(|surface| {
+                    self.set_surface(surface);
+                    self.set_geometry(geometry);
+                    Some(self)
+                })
+        }
+    }
 
     fn enable_cairo(mut self) -> Result<BaseDraw<Self>, cairo::Status>
         where Self: ::std::marker::Sized
@@ -93,3 +116,7 @@ pub trait Renderable {
         write_pixels(wlc_pixel_format::WLC_RGBA8888, geometry, &buffer);
     }
 }
+
+#[allow(dead_code)]
+/// Automatically drops the data for a surface.
+pub fn drop_data(_: Box<[u8]>) { }
