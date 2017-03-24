@@ -40,4 +40,7 @@ pub fn init() {
     // Construct the mouse category
     registry.add_category("mouse".into())
         .expect("Could not add mouse category");
+    // Construct the notifications category
+    registry.add_category("notifications".into())
+        .expect("Could not add notifications category");
 }

@@ -45,6 +45,15 @@ way_cooler.mouse = {
   lock_to_corner_on_resize = false
 }
 
+-- Options that dictate how notifications are displayed to the user
+way_cooler.notifications = {
+  default = {
+    background_color = 0x0,
+    title_color = 0xffffff,
+    text_color = 0xdddddd
+  }
+}
+
 --
 -- Keybindings
 --
