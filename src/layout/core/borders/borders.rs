@@ -26,15 +26,15 @@ pub struct Borders {
     output: WlcOutput,
     /// The specific color these borders should be colored.
     ///
-    /// If unspecified, the default is used.
+    /// If unspecified, the default from the registry is used.
     color: Option<Color>,
     /// The specific color the title bar should be colored.
     ///
-    /// If unspecified, the default is used.
+    /// If unspecified, the default from the registry is used.
     title_color: Option<Color>,
     /// The specific color the font for the title bar should be colored.
     ///
-    /// If unspecified, the default is used.
+    /// If unspecified, the default from the registry is used.
     title_font_color: Option<Color>
 }
 
@@ -53,26 +53,6 @@ impl Renderable for Borders {
                     title_font_color: None
                 })
             })
-    }
-
-    fn get_surface(&mut self) -> &mut ImageSurface {
-        &mut self.surface
-    }
-
-    fn set_surface(&mut self, surface: ImageSurface) {
-        self.surface = surface;
-    }
-
-    fn get_geometry(&self) -> Geometry {
-        self.geometry
-    }
-
-    fn set_geometry(&mut self, geometry: Geometry) {
-        self.geometry = geometry;
-    }
-
-    fn get_output(&self) -> WlcOutput {
-        self.output
     }
 
     fn allocate_buffer<F>(mut geometry: Geometry, drop_f: F)
@@ -101,6 +81,26 @@ impl Renderable for Borders {
                                            w as i32,
                                            h as i32,
                                            stride))
+    }
+
+    fn get_surface(&mut self) -> &mut ImageSurface {
+        &mut self.surface
+    }
+
+    fn set_surface(&mut self, surface: ImageSurface) {
+        self.surface = surface;
+    }
+
+    fn get_geometry(&self) -> Geometry {
+        self.geometry
+    }
+
+    fn set_geometry(&mut self, geometry: Geometry) {
+        self.geometry = geometry;
+    }
+
+    fn get_output(&self) -> WlcOutput {
+        self.output
     }
 }
 
