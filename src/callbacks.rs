@@ -92,11 +92,16 @@ pub extern fn post_render(output: WlcOutput) {
     for _ in 0..size {
         buffer.push(100);
     }
+    use ::notifications::{Notification, NotificationDraw};
+    use ::render::{Drawable, Renderable};
     let geo = Geometry {
         origin: Point { x: 0, y: 0},
-        size: resolution
+        size: Size { w: 100, h: 100 }
     };
-    write_pixels(wlc_pixel_format::WLC_RGBA8888, geo, &buffer);
+    let mut notification = Notification::new(geo, output).unwrap();
+    let draw = NotificationDraw::new(notification.enable_cairo().unwrap());
+    notification = draw.draw(geo).unwrap();
+    notification.render();
 }
 
 pub extern fn view_created(view: WlcView) -> bool {
