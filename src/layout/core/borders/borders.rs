@@ -39,22 +39,6 @@ pub struct Borders {
 }
 
 impl Renderable for Borders {
-    fn new(geometry: Geometry, output: WlcOutput) -> Option<Self> {
-        Borders::allocate_buffer(geometry,
-                                 drop_data)
-            .and_then(|surface| {
-                Some(Borders {
-                    title: "".into(),
-                    surface: surface,
-                    geometry: geometry,
-                    output: output,
-                    color: None,
-                    title_color: None,
-                    title_font_color: None
-                })
-            })
-    }
-
     fn allocate_buffer<F>(mut geometry: Geometry, drop_f: F)
                           -> Option<ImageSurface>
         where F: FnOnce(Box<[u8]>) + 'static
@@ -105,6 +89,22 @@ impl Renderable for Borders {
 }
 
 impl Borders {
+    pub fn new(geometry: Geometry, output: WlcOutput) -> Option<Self> {
+        Borders::allocate_buffer(geometry,
+                                 drop_data)
+            .and_then(|surface| {
+                Some(Borders {
+                    title: "".into(),
+                    surface: surface,
+                    geometry: geometry,
+                    output: output,
+                    color: None,
+                    title_color: None,
+                    title_font_color: None
+                })
+            })
+    }
+
     /// Gets the gap size
     pub fn gap_size() -> u32 {
         let lock = registry::clients_read();

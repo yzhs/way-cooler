@@ -130,21 +130,6 @@ impl NotificationBuilder {
 
 
 impl Renderable for Notification {
-    fn new(mut geometry: Geometry, output: WlcOutput) -> Option<Self> {
-        Notification::allocate_buffer(geometry, drop_data)
-            .and_then(|surface| {
-                Some(Notification {
-                    surface: surface,
-                    output: output,
-                    title: "".into(),
-                    text: "".into(),
-                    geometry: geometry,
-                    background_color: None,
-                    title_color: None,
-                    text_color: None
-                })})
-    }
-
     fn allocate_buffer<F>(geometry: Geometry, drop_f: F) -> Option<ImageSurface>
         where F: FnOnce(Box<[u8]>) + 'static {
         let Size { w, h } = geometry.size;
@@ -186,6 +171,21 @@ impl Renderable for Notification {
 }
 
 impl Notification {
+    pub fn new(mut geometry: Geometry, output: WlcOutput) -> Option<Self> {
+        Notification::allocate_buffer(geometry, drop_data)
+            .and_then(|surface| {
+                Some(Notification {
+                    surface: surface,
+                    output: output,
+                    title: "".into(),
+                    text: "".into(),
+                    geometry: geometry,
+                    background_color: None,
+                    title_color: None,
+                    text_color: None
+                })})
+    }
+
     /// Fetches the default background color for a notification from the
     /// registry.
     ///

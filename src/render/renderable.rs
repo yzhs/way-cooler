@@ -12,14 +12,6 @@ use super::draw::BaseDraw;
 /// a geometry to tell wlc where to place the bytes,
 /// and the `WlcOutput` that it will be rendered on.
 pub trait Renderable {
-    /// Makes a new `Renderable`
-    ///
-    /// Allowed to return `None` so that a needless allocation doesn't occur
-    /// (e.g when the geometry is 0).
-    fn new(geometry: Geometry, output: WlcOutput) -> Option<Self>
-        where Self: :: std::marker::Sized;
-
-
     /// Sets the underlying `ImageSurface` used by the `Renderable` to render
     /// to wlc.
     fn set_surface(&mut self, surface: ImageSurface);
