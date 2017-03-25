@@ -88,20 +88,24 @@ pub extern fn post_render(output: WlcOutput) {
     let resolution = output.get_resolution()
         .expect("Could not get resolution of output");
     let size = (4 * resolution.w * resolution.h) as usize;
-    let mut buffer = Vec::with_capacity(size);
+    /*let mut buffer = Vec::with_capacity(size);
     for _ in 0..size {
         buffer.push(100);
-    }
-    use ::notifications::{Notification, NotificationDraw};
+    }*/
+    use ::notifications::{self, Notification, NotificationDraw};
     use ::render::{Drawable, Renderable};
-    let geo = Geometry {
-        origin: Point { x: 0, y: 0},
-        size: Size { w: 100, h: 100 }
-    };
-    let mut notification = Notification::new(geo, output).unwrap();
-    let draw = NotificationDraw::new(notification.enable_cairo().unwrap());
-    notification = draw.draw(geo).unwrap();
-    notification.render();
+    let mut notifications = notifications::lock_notifications().unwrap();
+    if notifications.len() < 1 {
+        let geo = Geometry {
+            origin: Point { x: 0, y: 0},
+            size: Size { w: 100, h: 100 }
+        };
+        let mut notification = Notification::new(geo, output).unwrap();
+        let draw = NotificationDraw::new(notification.enable_cairo().unwrap());
+        notification = draw.draw(geo).unwrap();
+        notifications.push(notification);
+    }
+    notifications[0].render();
 }
 
 pub extern fn view_created(view: WlcView) -> bool {
