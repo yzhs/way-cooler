@@ -3,7 +3,6 @@ use rustwlc::{Geometry, Size, Point};
 use super::Notification;
 use ::render::{BaseDraw, Drawable, DrawErr, Renderable};
 
-use pango::{Context, Layout,};
 // Context, set some bits -> Layout, set some actual interesting bits,
 // and then call Layout::get_text(layout);
 
@@ -31,6 +30,18 @@ impl NotificationDraw {
     }
 
     fn draw_title_text(mut self, geo: Geometry) -> Result<Self, DrawErr<Notification>> {
+        // TODO Get the size of the extent of the string w/ self.base.text_extents(str)
+        // Then, with that calculated value set the size of the buffer (this should
+        // all be done in Notification::allocate)
+        // For strings that make a size bigger than 1/4 of the screen,
+        // truncate them with "..." at the end.
+        // with that size, draw the string.
+
+        // For the body of the text, do the same thing but instead of truncating
+        // split it up into a Vec<String>, which is limited in the y value  by
+        // 1/4 the screen height. E.g after that add ...
+        // The line size can be calculated by summing the y values of the extents
+        // of all the lines.
         let title: String =
             "Test title a really really \n really really really long title".into();
         use cairo::{Glyph, TextCluster};

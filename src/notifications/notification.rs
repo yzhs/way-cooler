@@ -39,6 +39,95 @@ pub struct Notification {
     text_color: Option<Color>
 }
 
+/// Builder for a Notification. This ensures that when it's created
+/// it can construct an appropriately sized buffer for the text.
+///
+/// Also allows you to pre-set the colors.
+pub struct NotificationBuilder {
+    /// The string that's displayed as the "title"
+    /// or "header" of the notificaiton.
+    title: String,
+    /// The string that's displayed as the body text of the notification.
+    text: String,
+    /// The background color that the text is overlayed on to.
+    ///
+    /// If unspecified, the default from the registry is used.
+    background_color: Option<Color>,
+    /// The color that the header/title text is displayed in.
+    ///
+    /// If unspecified, the default from the registry is used.
+    title_color: Option<Color>,
+    /// The color that the body text is displayed in.
+    ///
+    /// If unspecified, the default from the registry is used.
+    text_color: Option<Color>
+}
+
+/// Calculates how big the notification should be, based on the given title
+/// and text strings.
+///
+/// Notifications are limited to 1/4 the width and 1/4 the height of the screen.
+///
+/// If the title text is too long, it is truncated and has ellipses appended.
+///
+/// If the body text is too long, then it is split into multiple lines,
+/// with the final line being truncated with ellipses if it would push the
+/// height to be bigger than 1/4 the height of the screen.
+///
+/// The passed in strings are modified to have these changes reflected.
+///
+/// Each element in the text `Vec` corresponds to a line of input,
+/// if the passed in `Vec` has a length > 1, then it collapses them down
+/// into one string and then processes it, as if each line had been part
+/// of the first line. This is in order to simplify the algorithm.
+fn calc_notification_geo(title: &mut String, text: &mut Vec<String>) -> Geometry {
+    panic!()
+}
+
+impl NotificationBuilder {
+    pub fn new() -> Self {
+        NotificationBuilder {
+            title: "".into(),
+            text: "".into(),
+            background_color: None,
+            title_color: None,
+            text_color: None
+        }
+    }
+
+    /// Construct the notification for the given output.
+    pub fn build(mut self, output: WlcOutput) -> Option<Notification> {
+        let mut text = vec![self.text];
+        let geo = calc_notification_geo(&mut self.title, &mut text);
+        Notification::new(geo, output)
+    }
+
+    pub fn title(mut self, title: String) -> Self {
+        self.title = title;
+        self
+    }
+
+    pub fn text(mut self, text: String) -> Self {
+        self.text = text;
+        self
+    }
+
+    pub fn background_color(mut self, color: Option<Color>) -> Self {
+        self.background_color = color;
+        self
+    }
+
+    pub fn title_color(mut self, color: Option<Color>) -> Self {
+        self.title_color = color;
+        self
+    }
+
+    pub fn text_color(mut self, color: Option<Color>) -> Self {
+        self.text_color = color;
+        self
+    }
+}
+
 
 impl Renderable for Notification {
     fn new(mut geometry: Geometry, output: WlcOutput) -> Option<Self> {
