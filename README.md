@@ -46,11 +46,11 @@ and is not backwards compatible with existing X11 tools, we wanted to put our st
 - Borders around windows
 - Gaps between windows
 - Basic X11 bar support (e.g [lemonbar][], [polybar][])
+- Screen grabber / screen shot taker
 
 ## Planned Features
 
 - i3 tabbed/stacked tiling
-- Screen grabber / screen shot taker
 - Notification support
 - Lock screen
 - Tiling window through configurable Lua scripts (awesome-style)
@@ -69,6 +69,18 @@ Follow the development of these features in our [issues section] or checkout our
 [way-cooler][way-cooler-aur]
 
 [way-cooler-git][way-cooler-git-aur]
+
+## NixOS
+
+@miltador was kind enough to provide a [NixOS package](https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/window-managers/way-cooler/default.nix).
+
+## Installation Script
+
+For users who are not on Arch or NixOS, we have provided a simple install script that you can run in the terminal in order to install Way Cooler.
+
+```
+curl https://way-cooler.github.io/way-cooler-release-i3-default.sh -sSLf | sh -s way-cooler-bg  wc-grab 
+```
 
 ## Build from source
 
@@ -93,17 +105,20 @@ You can try it out while running in an X environment, or switch to a TTY and run
 
 # Init File
 
-All keyboard shortcuts (except the command to exit Way Cooler) are configurable through the init file. The recommended strategy is to copy the [default configuration file](https://github.com/way-cooler/way-cooler/blob/master/config/init.lua) to `$XDG_CONFIG_HOME/way-cooler/init.lua` and edit from there.
+All keyboard shortcuts are configurable through the init file. The recommended strategy is to copy the [default configuration file](https://github.com/way-cooler/way-cooler/blob/master/config/init.lua) to `$XDG_CONFIG_HOME/way-cooler/init.lua` and edit from there.
 
 # Contributors
 Way Cooler was started by @Timidger and @SnirkImmington, but these fine people have helped us:
 
 - @vinipsmaker created (and maintains) AUR packages
+- @miltador created NixOS package
 - @starfys created way-cooler desktop file
 - @toogley fixed a link
 - @paulmenzel fixed a typo
 - @thefarwind made kill way-cooler command rebindable
 - @bluss for updating our use of `PetGraph` to use `StableGraph`
+- @Abdillah fixed background program to have solid colors be variable size at initilization.
+- @hedning fixed an unsigned underflow in the tiling code
 
 And of course, thanks to the Rust community and the developers of [wlc].
 
