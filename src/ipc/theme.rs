@@ -13,7 +13,7 @@ pub fn setup(f: &mut DBusFactory) -> DBusObjPath {
     f.object_path("/org/way_cooler/Theme", ()).introspectable().add(
         f.interface("org.way_cooler.Theme", ())
             .add_m(
-                f.method("Get", (), |m| {
+                f.method("Windows", (), |m| {
                     let lock = registry::clients_read();
                     let client = lock.client(Uuid::nil()).unwrap();
                     let handle = registry::ReadHandle::new(&client);
