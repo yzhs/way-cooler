@@ -7,6 +7,7 @@ use ::registry;
 use uuid::Uuid;
 
 use super::utils::{parse_uuid, lock_tree_dbus};
+use ::layout::ContainerType;
 use super::{DBusFactory, DBusObjPath};
 
 pub fn setup(f: &mut DBusFactory) -> DBusObjPath {
@@ -48,16 +49,22 @@ pub fn setup(f: &mut DBusFactory) -> DBusObjPath {
                             })?;
                     }
 
-                    let lock = registry::clients_write();
-                    let client = lock.client(Uuid::nil()).unwrap();
-                    let mut handle = registry::WriteHandle::new(&client);
-                    handle.write("windows".into()).ok()
-                        .and_then(|windows| {
-                            for (key, value) in json.iter() {
-                                windows.insert(key.clone(), value.clone());
-                            }
-                            Some(())
-                        }).expect("Could not add data to windows category");
+                    // Make sure to drop the lock, before updating the tree.
+                    {
+                        let lock = registry::clients_write();
+                        let client = lock.client(Uuid::nil()).unwrap();
+                        let mut handle = registry::WriteHandle::new(&client);
+                        handle.write("windows".into()).ok()
+                            .and_then(|windows| {
+                                for (key, value) in json.iter() {
+                                    windows.insert(key.clone(), value.clone());
+                                }
+                                Some(())
+                            }).expect("Could not add data to windows category");
+                    }
+                    // Re-tile tree, so that it immediantly updates.
+                    let mut tree = lock_tree_dbus()?;
+                    tree.layout_active_of(ContainerType::Root);
                     Ok(vec![m.msg.method_return()
                             .append(true)
                     ])
