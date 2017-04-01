@@ -4,7 +4,7 @@
 use std::ops::{Deref, DerefMut};
 use std::collections::hash_map::HashMap;
 
-use rustc_serialize::json::{Json};
+use rustc_serialize::json::{Json, ToJson};
 
 /// The main data mapping between a key and some Json.
 pub type DataMap = HashMap<String, Json>;
@@ -54,5 +54,14 @@ impl Deref for Category {
 impl DerefMut for Category {
     fn deref_mut(&mut self) -> &mut DataMap {
         &mut self.data
+    }
+}
+
+impl ToJson for Category {
+    fn to_json(&self) -> Json {
+        use std::collections::BTreeMap;
+        let mut map = BTreeMap::new();
+        map.insert(self.name.clone(), self.data.to_json());
+        Json::Object(map)
     }
 }
