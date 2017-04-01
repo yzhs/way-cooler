@@ -15,6 +15,7 @@ pub use self::session::DBusSession;
 
 mod layout;
 mod screen;
+mod theme;
 
 pub const VERSION: u32 = 1;
 

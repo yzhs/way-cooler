@@ -32,7 +32,8 @@ impl DBusSession {
 
         let tree = factory.tree()
             .add(super::layout::setup(&mut factory))
-            .add(super::screen::setup(&mut factory));
+            .add(super::screen::setup(&mut factory))
+            .add(super::theme::setup(&mut factory));
 
         //super::keybindings::setup(&mut factory);
 
