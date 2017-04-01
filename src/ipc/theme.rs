@@ -38,7 +38,15 @@ pub fn setup(f: &mut DBusFactory) -> DBusObjPath {
                     if !json.is_object() {
                         return Err(MethodErr::failed(&"JSON must be an object"))
                     }
-                    let json = json.as_object().unwrap();
+                    let mut json = json.as_object().unwrap();
+                    // If user input nested in "windows" object, unwrap it
+                    if json.get("windows".into()).is_some() {
+                        json = json.get("windows".into()).unwrap()
+                            .as_object().ok_or_else(|| {
+                                MethodErr::failed(
+                                    &"windows value must be an object")
+                            })?;
+                    }
 
                     let lock = registry::clients_write();
                     let client = lock.client(Uuid::nil()).unwrap();
