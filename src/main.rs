@@ -1,5 +1,6 @@
 //! Main module of way-cooler
 
+#![feature(test)]
 #[macro_use]
 extern crate lazy_static;
 extern crate bitflags;

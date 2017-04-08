@@ -776,7 +776,7 @@ impl IndexMut<NodeIndex> for InnerTree {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
 
     use super::*;
     use super::super::container::*;
@@ -791,7 +791,7 @@ mod tests {
     ///
     /// The active container is the only view in the first workspace
     #[allow(unused_variables)]
-    fn basic_tree() -> InnerTree {
+    pub fn basic_tree() -> InnerTree {
         let mut tree = InnerTree::new();
         let fake_view_1 = WlcView::root();
         let fake_output = fake_view_1.clone().as_output();
